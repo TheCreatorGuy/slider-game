@@ -1,6 +1,6 @@
 # Slider Game
 
-This "Slider Game" was a project initially started for my Senior Project in high school, which was an open ended research/application project that I did about video game creation. Later, I decided to port the project to JavaScript as an exercize in learning the language and refactoring.
+This "Slider Game" was a project initially started for my Senior Project in high school, which was an open ended research/application project that I did about video game creation. Later, I decided to port the project to JavaScript as an exercise in learning the language and refactoring.
 
 ## JavaScript Version
 
