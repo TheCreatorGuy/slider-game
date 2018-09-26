@@ -2,7 +2,13 @@
 
 This "Slider Game" was a project initially started for my Senior Project in high school, which was an open ended research/application project that I did about video game creation. Later, I decided to port the project to JavaScript as an exercize in learning the language and refactoring.
 
-## Setup
+## JavaScript Version
+
+I am currently hosting this version on my [website](http://itstimjohnson.com/slider.html), however you can also run it directly from the given html file. Unfortunately, Google Chrome doesn't understand that a file originating on your local machine might have a legitimate reason to access local files, so you will have to use another browser if you choose to do it this way, I used FireFox. The issue with this version is that it uses far more memory than it needs to because it redraws the background every frame, making it run slower than the python version.
+
+## Python Version
+
+### Setup
 
 The Python version was built with Python2.7 and pygame.
 
