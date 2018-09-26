@@ -265,7 +265,7 @@ def renderFrame(msSinceStart):
 
 def main():
     init()
-    pygame.mixer.Sound("assets/music/bckgrndMusic.wav").play(-1)
+    pygame.mixer.Sound("assets/audio/bckgrndMusic.wav").play(-1)
 
     global heroPos, disappearingTilesOn, heroVel, currentLevel
     dirMoving = None
