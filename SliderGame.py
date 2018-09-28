@@ -1,8 +1,25 @@
 import sys, pygame, math, pygame.mixer
 pygame.init()
 
+GRID_SIZE = 25
+ID_WALL             = 1
+ID_LAVA             = 2
+ID_GOAL             = 3
+ID_ORANGE_BUTTON    = 4
+ID_ORANGE_TILE_OFF  = 5
+ID_TEAL_BUTTON      = 6
+ID_TEAL_TILE_OFF    = 7
+ID_BLUE_BUTTON      = 8
+ID_BLUE_TILE_OFF    = 9
+ID_PINK_TP          = 10
+ID_PURPLE_TP        = 11
+ID_ORANGE_TILE_ON   = 12
+ID_TEAL_TILE_ON     = 13
+ID_BLUE_TILE_ON     = 14
+
+
 #Frequently Changed
-finalLevel = 12
+FINAL_LEVEL = 12
 
 # Colors
 backgroundClr = 0, 0, 0
@@ -29,7 +46,7 @@ hero = pygame.Surface((20, 20))
 
 # Game Variables
 screen = pygame.display.set_mode((500, 540))
-levelGrid = [[0] * 25 for _ in range(25)]
+levelGrid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
 disappearingTilesOn = [True, True, True]
 disappearingTilesInitState = [True, True, True]
 tp1Locations = [(-1, -1), (-1, -1)]
@@ -135,7 +152,7 @@ def keyPressed(key):
     return False
 
 def saveLevel(level):
-    saveFile = open("Level" + str(level) + ".txt", 'w')
+    saveFile = open("assets/levels/Level" + str(level) + ".txt", 'w')
     saveFile.truncate()
     for i in range(0, len(levelGrid)):
         for j in range(0, len(levelGrid[i])):
@@ -273,7 +290,7 @@ def main():
     while True:
         frameClock = pygame.time.Clock()
         msSinceStart = 0
-        while currentLevel <= finalLevel:
+        while currentLevel <= FINAL_LEVEL:
             loadLevel(currentLevel)
             heroPos = [spawn[0] * 20, spawn[1] * 20]
             won = False
