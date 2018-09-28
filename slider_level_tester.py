@@ -1,5 +1,5 @@
 """
-Filename: slider_solver.py
+Filename: slider_level_tester.py
 Interpreter: 2.7
 Author: Tim Johnson
 Description: A project designed to find the best solution to every level of my slider game.
@@ -7,6 +7,10 @@ Description: A project designed to find the best solution to every level of my s
 import slidergame, sys
 
 def main():
+    """
+    Starts the game at the given level
+    :return: None
+    """
     if len(sys.argv) != 2:
         slidergame.currentLevel = int(raw_input("What level do you want to test? "))
     else:
