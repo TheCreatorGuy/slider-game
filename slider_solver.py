@@ -214,9 +214,133 @@ def find_solution(level_num):
     return ret
 
 
+def play_solved():
+    """
+    Modified slidergame.py main that now takes the solution path and executes it
+    :return: None
+    """
+    sg.init()
+    sg.pygame.mixer.Sound("assets/audio/bckgrndMusic.wav").play(-1)
+
+    dirMoving = None
+    justStartedMoving = False
+    while True:
+        frameClock = sg.pygame.time.Clock()
+        msSinceStart = 0
+        while sg.currentLevel <= sg.FINAL_LEVEL:
+            sg.loadLevel(sg.currentLevel)
+            with open("assets/solutions/Level" + str(sg.currentLevel) + ".sol") as f:
+                solution = f.readline()
+            sg.heroPos = [sg.spawn[0] * 20, sg.spawn[1] * 20]
+            won = False
+            while not won:
+                msSinceStart += frameClock.tick(60)
+                for event in sg.pygame.event.get():
+                    if event.type == sg.pygame.QUIT:
+                        sys.exit()
+
+                if dirMoving is None:
+                    sg.heroVel = [0, 0]
+                    if len(solution) > 0:
+                        if solution[0] == LEFT:
+                            dirMoving = "left"
+                            justStartedMoving = True
+                        if solution[0] == DOWN:
+                            dirMoving = "down"
+                            justStartedMoving = True
+                        if solution[0] == RIGHT:
+                            dirMoving = "right"
+                            justStartedMoving = True
+                        if solution[0] == UP:
+                            dirMoving = "up"
+                            justStartedMoving = True
+                        solution = solution[1:]
+                if dirMoving == "left":
+                    sg.heroVel[0] = -sg.speed
+                elif dirMoving == "down":
+                    sg.heroVel[1] = sg.speed
+                elif dirMoving == "right":
+                    sg.heroVel[0] = sg.speed
+                elif dirMoving == "up":
+                    sg.heroVel[1] = -sg.speed
+
+                if not justStartedMoving and float(sg.heroPos[0] / 20.0).is_integer() and float(
+                        sg.heroPos[1] / 20.0).is_integer():
+                    if sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 2:
+                        sg.disappearingTilesOn = list(sg.disappearingTilesInitState)
+                        dirMoving = None
+                        sg.heroPos = [sg.spawn[0] * 20, sg.spawn[1] * 20]
+                    elif sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 4:
+                        if dirMoving is not None:
+                            sg.disappearingTilesOn[0] = not sg.disappearingTilesOn[0]
+                    elif sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 6:
+                        if dirMoving is not None:
+                            sg.disappearingTilesOn[1] = not sg.disappearingTilesOn[1]
+                    elif sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 8:
+                        if dirMoving is not None:
+                            sg.disappearingTilesOn[2] = not sg.disappearingTilesOn[2]
+                    elif sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 10:
+                        if dirMoving is not None:
+                            if (int(sg.heroPos[1] / 20), int(sg.heroPos[0] / 20)) == sg.tp1Locations[0]:
+                                sg.heroPos = [sg.tp1Locations[1][1] * 20, sg.tp1Locations[1][0] * 20]
+                            else:
+                                sg.heroPos = [sg.tp1Locations[0][1] * 20, sg.tp1Locations[0][0] * 20]
+                    elif sg.levelGrid[int(sg.heroPos[1] / 20)][int(sg.heroPos[0] / 20)] == 11:
+                        if dirMoving is not None:
+                            if (int(sg.heroPos[1] / 20), int(sg.heroPos[0] / 20)) == sg.tp2Locations[0]:
+                                sg.heroPos = [sg.tp2Locations[1][1] * 20, sg.tp2Locations[1][0] * 20]
+                            else:
+                                sg.heroPos = [sg.tp2Locations[0][1] * 20, sg.tp2Locations[0][0] * 20]
+                elif justStartedMoving:
+                    justStartedMoving = False
+
+                if dirMoving == "right":
+                    xIndex = int(sg.math.floor((sg.heroPos[0] + sg.heroVel[0] + 15) / 20))
+                else:
+                    xIndex = int(sg.math.floor((sg.heroPos[0] + sg.heroVel[0]) / 20))
+                if dirMoving == "down":
+                    yIndex = int(sg.math.floor((sg.heroPos[1] + sg.heroVel[1] + 15) / 20))
+                else:
+                    yIndex = int(sg.math.floor((sg.heroPos[1] + sg.heroVel[1]) / 20))
+
+                if dirMoving is not None:
+                    if xIndex in range(25) and yIndex in range(25):
+                        if sg.levelGrid[yIndex][xIndex] == 1 or \
+                                sg.disappearingTilesOn[0] and sg.levelGrid[yIndex][xIndex] == 5 or \
+                                sg.disappearingTilesOn[1] and sg.levelGrid[yIndex][xIndex] == 7 or \
+                                sg.disappearingTilesOn[2] and sg.levelGrid[yIndex][xIndex] == 9 or \
+                                not sg.disappearingTilesOn[0] and sg.levelGrid[yIndex][xIndex] == 12 or \
+                                not sg.disappearingTilesOn[1] and sg.levelGrid[yIndex][xIndex] == 13 or \
+                                not sg.disappearingTilesOn[2] and sg.levelGrid[yIndex][xIndex] == 14:
+                            dirMoving = None
+                        else:
+                            sg.heroPos[0] += sg.heroVel[0]
+                            sg.heroPos[1] += sg.heroVel[1]
+                    else:
+                        dirMoving = None
+                elif sg.levelGrid[yIndex][xIndex] == 3:
+                    won = True
+
+                sg.renderFrame(msSinceStart)
+                # while not won
+            sg.currentLevel += 1
+            # while currentLevel <= finalLevel
+        while True:
+            for event in sg.pygame.event.get():
+                if event.type == sg.pygame.QUIT:
+                    sys.exit()
+
+            sg.screen.fill(sg.backgroundClr)
+            timeLabel = sg.largeFont.render(sg.minDigits(str(int(msSinceStart / 1000.0 / 60.0)), 2) + ":" + sg.minDigits(
+                str(int(msSinceStart / 1000.0 % 60.0)), 2), True, (255, 255, 255))
+            sg.screen.blit(timeLabel, sg.pygame.Rect(250 - timeLabel.get_width() / 2, (270 - timeLabel.get_height()) / 2,
+                                               timeLabel.get_width(), timeLabel.get_height()))
+            sg.pygame.display.flip()
+
+
 def main():
     """
-    Finds the solution to every level of the slider game and stores in a solution file.
+    Finds the solution to every level of the slider game and stores in a solution file, then plays the game with it
     :return: None
     """
     print "Finding solutions to the SliderGame levels! Hold on tight!\n"
@@ -224,9 +348,11 @@ def main():
         print "Finding Solution for level " + str(level) + "..."
         path = find_solution(level)
         print "Solution found! The answer is: (" + path + "), comprising of " + str(len(path)) + " moves\n"
-        savefile = open("assets/solutions/Level" + str(level) + "solution.sol", 'w')
+        savefile = open("assets/solutions/Level" + str(level) + ".sol", 'w')
         savefile.write(path)
         savefile.close()
+
+    play_solved()
 
 
 if __name__ == "__main__":
