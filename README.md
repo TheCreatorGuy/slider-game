@@ -8,9 +8,9 @@ I am currently hosting this version on my [website](http://itstimjohnson.com/sli
 
 ## Python Version
 
-### Setup
-
 The Python version was built with Python2.7 and pygame.
+
+### Setup
 
 1.  To start, if you don't have it already, install Python2.7 [here](https://www.python.org/downloads/release/python-2713/). Make sure to check the "add to path" option.
 
