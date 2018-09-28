@@ -1,91 +1,91 @@
-import pygame, sys, math, SliderGame
+import pygame, sys, math, slidergame
 
 mousePos = [0,0]
 
 def setTile(tile):
     row = int(math.floor(mousePos[1] / 20))
     column = int(math.floor(mousePos[0] / 20))
-    SliderGame.levelGrid[row][column] = tile
+    slidergame.levelGrid[row][column] = tile
 
 def main():
-    SliderGame.init()
-    SliderGame.screen = pygame.display.set_mode((500, 500))
+    slidergame.init()
+    slidergame.screen = pygame.display.set_mode((500, 500))
 
     level = raw_input("What level do you want to edit?\n")
-    SliderGame.loadLevel(level)
+    slidergame.loadLevel(level)
 
     global mousePos
     while True:
         mousePos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                SliderGame.saveLevel(level)
+                slidergame.saveLevel(level)
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                SliderGame.keysDown[event.key] = True
-                SliderGame.keysJustPressed[event.key] = True
+                slidergame.keysDown[event.key] = True
+                slidergame.keysJustPressed[event.key] = True
             if event.type == pygame.KEYUP:
-                SliderGame.keysDown[event.key] = False
-                SliderGame.keysJustPressed[event.key] = False
+                slidergame.keysDown[event.key] = False
+                slidergame.keysJustPressed[event.key] = False
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:
                 row = int(math.floor(mousePos[1] / 20))
                 column = int(math.floor(mousePos[0] / 20))
-                if SliderGame.levelGrid[row][column] == 4 or SliderGame.levelGrid[row][column] == 5 or \
-                                SliderGame.levelGrid[row][column] == 12:
-                    SliderGame.disappearingTilesOn[0] = not SliderGame.disappearingTilesOn[0]
-                if SliderGame.levelGrid[row][column] == 6 or SliderGame.levelGrid[row][column] == 7 or \
-                                SliderGame.levelGrid[row][column] == 13:
-                    SliderGame.disappearingTilesOn[1] = not SliderGame.disappearingTilesOn[1]
-                if SliderGame.levelGrid[row][column] == 8 or SliderGame.levelGrid[row][column] == 9 or \
-                                SliderGame.levelGrid[row][column] == 14:
-                    SliderGame.disappearingTilesOn[2] = not SliderGame.disappearingTilesOn[2]
+                if slidergame.levelGrid[row][column] == 4 or slidergame.levelGrid[row][column] == 5 or \
+                                slidergame.levelGrid[row][column] == 12:
+                    slidergame.disappearingTilesOn[0] = not slidergame.disappearingTilesOn[0]
+                if slidergame.levelGrid[row][column] == 6 or slidergame.levelGrid[row][column] == 7 or \
+                                slidergame.levelGrid[row][column] == 13:
+                    slidergame.disappearingTilesOn[1] = not slidergame.disappearingTilesOn[1]
+                if slidergame.levelGrid[row][column] == 8 or slidergame.levelGrid[row][column] == 9 or \
+                                slidergame.levelGrid[row][column] == 14:
+                    slidergame.disappearingTilesOn[2] = not slidergame.disappearingTilesOn[2]
 
-        if SliderGame.keysDown[49]:
+        if slidergame.keysDown[49]:
             setTile(0)
-        if SliderGame.keysDown[113]:
+        if slidergame.keysDown[113]:
             setTile(1)
-        if SliderGame.keysDown[97]:
+        if slidergame.keysDown[97]:
             setTile(2)
-        if SliderGame.keysDown[121]:
+        if slidergame.keysDown[121]:
             setTile(3)
-        if SliderGame.keysDown[54]:
+        if slidergame.keysDown[54]:
             row = int(math.floor(mousePos[1] / 20))
             column = int(math.floor(mousePos[0] / 20))
-            SliderGame.spawn = column, row
-        if SliderGame.keysDown[51]:
+            slidergame.spawn = column, row
+        if slidergame.keysDown[51]:
             setTile(4)
-        if SliderGame.keysDown[101]:
+        if slidergame.keysDown[101]:
             setTile(5)
-        if SliderGame.keysDown[52]:
+        if slidergame.keysDown[52]:
             setTile(6)
-        if SliderGame.keysDown[114]:
+        if slidergame.keysDown[114]:
             setTile(7)
-        if SliderGame.keysDown[53]:
+        if slidergame.keysDown[53]:
             setTile(8)
-        if SliderGame.keysDown[116]:
+        if slidergame.keysDown[116]:
             setTile(9)
-        if SliderGame.keysDown[50]:
+        if slidergame.keysDown[50]:
             setTile(10)
-        if SliderGame.keysDown[119]:
+        if slidergame.keysDown[119]:
             setTile(11)
-        if SliderGame.keysDown[100]:
+        if slidergame.keysDown[100]:
             setTile(12)
-        if SliderGame.keysDown[102]:
+        if slidergame.keysDown[102]:
             setTile(13)
-        if SliderGame.keysDown[103]:
+        if slidergame.keysDown[103]:
             setTile(14)
-        if SliderGame.keyPressed(32):
-            temp = raw_input("What should the title be? Enter nothing to use the previous title: " + SliderGame.lvlTitle + '\n')
+        if slidergame.keyPressed(32):
+            temp = raw_input("What should the title be? Enter nothing to use the previous title: " + slidergame.lvlTitle + '\n')
             if temp is not "":
-                SliderGame.lvlTitle = temp
-        if SliderGame.keyPressed(13):
-            SliderGame.saveLevel(level)
+                slidergame.lvlTitle = temp
+        if slidergame.keyPressed(13):
+            slidergame.saveLevel(level)
             sys.exit()
 
-        SliderGame.screen.fill(SliderGame.backgroundClr)
-        SliderGame.fillGameArea()
-        SliderGame.gameArea.blit(SliderGame.hero, pygame.Rect(SliderGame.spawn[0] * 20, SliderGame.spawn[1] * 20, 20, 20))
-        SliderGame.screen.blit(SliderGame.gameArea, pygame.Rect(0, 0, 500, 500))
+        slidergame.screen.fill(slidergame.backgroundClr)
+        slidergame.fillGameArea()
+        slidergame.gameArea.blit(slidergame.hero, pygame.Rect(slidergame.spawn[0] * 20, slidergame.spawn[1] * 20, 20, 20))
+        slidergame.screen.blit(slidergame.gameArea, pygame.Rect(0, 0, 500, 500))
         pygame.display.flip()
 
 if __name__ == "__main__":

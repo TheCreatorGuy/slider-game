@@ -1,10 +1,10 @@
 """
-Filename: slidergame_solver.py
+Filename: slider_solver.py
 Interpreter: 2.7
 Author: Tim Johnson
 Description: A project designed to find the best solution to every level of my slider game.
 """
-import SliderGame as sg
+import slidergame as sg
 import Queue as q
 import copy
 import sys
@@ -167,7 +167,7 @@ class LevelState:
 
 def level_to_class(level_num):
     """
-    Takes the information from SliderGame.py and converts it into the initial LevelState class to find
+    Takes the information from slidergame.py and converts it into the initial LevelState class to find
     the solution of
     :param level_num: the level number to get the class of
     :return: tuple of the corresponding LevelState and the previous location grid with the start state included
