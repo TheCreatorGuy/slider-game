@@ -33,7 +33,15 @@ cd path-to-folder
 6.  Finally, execute the game with 
 
 ```
-python27 SliderGame.py
+python27 slidergame.py
 ```
 
 Enjoy!
+
+# Slider Solver
+
+With the game comes packaged a more recent project aimed at solving every puzzle using the smallest number of moves. To run this, follow the steps for running the game except type `python27 slider_solver.py` instead of `python27 slidergame.py`
+
+# Other Files
+
+The other files packaged within are helper scripts that I used to create the levels. At the moment, it is very hard to read and use them without prior knowledge of the game, so I would not recommend creating your own levels with them yet. If you want to dive into the code to see how they work and try to piece together how to use them, go for it, but you were warned.
