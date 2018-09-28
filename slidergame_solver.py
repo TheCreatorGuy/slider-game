@@ -5,6 +5,7 @@ Author: Tim Johnson
 Description: A project designed to find the best solution to every level of my slider game.
 """
 import SliderGame as sg
+import Queue as q
 import copy
 import sys
 
@@ -29,11 +30,7 @@ class LevelState:
 
     # Node information
     path = ""
-    failed = False
     complete = False
-    depth = 0
-    prev_node = None
-    next_nodes = None
 
     def __init__(self, toggletile_states, tp1_locs, tp2_loc, hero_x, hero_y):
         """
@@ -44,7 +41,7 @@ class LevelState:
         :param hero_x: x coordinate of the hero
         :param hero_y: y coordinate of the hero
         """
-        self.toggletile_states = toggletile_states
+        self.toggletile_states = list(toggletile_states)
         self.tp1_locs = tp1_locs
         self.tp2_locs = tp2_loc
         self.hero_x = hero_x
@@ -57,9 +54,7 @@ class LevelState:
         :return: new copy of the node
         """
         cpy = LevelState(self.toggletile_states, self.tp1_locs, self.tp2_locs, self.hero_x, self.hero_y)
-        cpy.prev_node = self
         cpy.path = self.path
-        cpy.depth = self.depth
         return cpy
 
     def equals(self, other):
@@ -75,9 +70,9 @@ class LevelState:
         Sets the state information of this state to what it would be if the player had input the
         direction supplied to this function
         :param direction: direction to move the hero
-        :return: None
+        :return: whether or not this step succeeded
         """
-        self.path += direction #This is how we get the path in the end
+        self.path += direction  # This is how we get the path in the end
 
         # For the sake of reusing code, the position is verified relatively
         vert = 0
@@ -90,7 +85,7 @@ class LevelState:
             hor = 1
         elif direction == LEFT:
             hor = -1
-        while 0 <= self.hero_y < sg.GRID_SIZE :
+        while 0 <= self.hero_y < sg.GRID_SIZE:
             # If the next movement would be out of bounds, do not move the player and end movement
             if self.hero_x+hor < 0 or self.hero_x+hor >= sg.GRID_SIZE or \
                     self.hero_y+vert < 0 or self.hero_y+vert >= sg.GRID_SIZE:
@@ -114,7 +109,7 @@ class LevelState:
 
             # If the position was lava, this state is a failed state
             if pos == sg.ID_LAVA:
-                self.failed = True
+                return False
 
             # Toggle any buttons
             if pos == sg.ID_ORANGE_BUTTON:
@@ -140,36 +135,34 @@ class LevelState:
         if sg.levelGrid[self.hero_y][self.hero_x] == sg.ID_GOAL:
             self.complete = True
 
-    def next_gen(self):
+        return True
+
+    def next_gen(self, prev_loc_grid):
         """
         Generate the next_nodes given every direction except the last hit direction (because that should
         theoretically never move us) and any direction that would give us a state that is equivalent
         to one that we have already reached in this or another branch, but in fewer moves
-        :return: None
+        :param: prev_loc_grid: a grid of lists. This grid should be the same dimensions of the level. It is
+                    modified here so that if a new state does not find itself repeating on this grid, it
+                    adds itself. If it is on the grid, it does not add itself to the next_nodes
+        :return: list of the next generation of states, or children
         """
         # Failsafe so we don't do this twice
-        if self.next_nodes is not None:
-            return
-        self.next_nodes = []
+        children = []
 
         # Make a new state for every direction
         for direction in DIRECTIONS:
-            if self.path[-1:] != direction: #except the last direction
+            if self.path[-1:] != direction:  # except the last direction
                 new_state = copy.copy(self)
-                new_state.depth += 1 #keep track of depth so we can disregard superfluous states
-                new_state.next_step(direction) #change state so we can verify if it is a repeat
+                if not new_state.next_step(direction):  # change state so we can verify if it is a repeat
+                    continue
 
-                # Check every previous state on this branch to see if they are the same. If so,
-                # it is a repeated state and should not be used again.
-                repeat_state = False
-                back_step = self
-                while back_step is not None:
-                    if new_state.equals(back_step):
-                        repeat_state = True
-                        break
-                    back_step = back_step.prev_node
-                if not repeat_state:
-                    self.next_nodes.append(new_state)
+                # Check new state to see if it repeats in the prev_loc_grid. If it isn't, use it
+                if not new_state.toggletile_states in prev_loc_grid[new_state.hero_y][new_state.hero_x]:
+                    prev_loc_grid[new_state.hero_y][new_state.hero_x].append(new_state.toggletile_states)
+                    children.append(new_state)
+
+        return children
 
 
 def level_to_class(level_num):
@@ -177,49 +170,49 @@ def level_to_class(level_num):
     Takes the information from SliderGame.py and converts it into the initial LevelState class to find
     the solution of
     :param level_num: the level number to get the class of
-    :return: the corresponding LevelState
+    :return: tuple of the corresponding LevelState and the previous location grid with the start state included
     """
     sg.loadLevel(level_num)
-    return LevelState(sg.disappearingTilesInitState, sg.tp1Locations, sg.tp2Locations,
-                      sg.spawn[0], sg.spawn[1])
+    prev_loc_grid = [[[] for _ in range(sg.GRID_SIZE)] for _ in range(sg.GRID_SIZE)]
+    start_node = LevelState(sg.disappearingTilesInitState, sg.tp1Locations, sg.tp2Locations, sg.spawn[0], sg.spawn[1])
+    prev_loc_grid[start_node.hero_y][start_node.hero_x].append(start_node.toggletile_states)
+    return start_node, prev_loc_grid
 
-def find_solution(tree_start):
+
+def find_solution(level_num):
     """
-    The wrapper function to find the best path to solve the level from the start node given
-    :param tree_start: starting LevelState node for the level to be solved
-    :return: string for the smallest possible sequence of inputs to solve the level, or "unsolvable"
-                if the solver ran through every possible solution but none was successful
+    Finds the solution to the given level and returns its path, unless it is unsolvable
+    :param level_num: level to find the solution of
+    :return: the path of the solution, or "unsolvable" if there is no solution
     """
-    best_solution = find_solution_rec(tree_start)
-    if best_solution is None:
-        return "unsolvable"
-    return best_solution.path
+    ret = "unsolvable"
 
-def find_solution_rec(current_node, best_depth=sys.maxint):
-    """
-    Recursively finds any completed nodes from the children of the current node
-    :param current_node: the node to check for children
-    :param best_depth: limiter depth so we abort any trees that would be suboptimal
-    :return: node with the best solution of all children, or None if there was no better solution
-                than the given best_depth
-    """
-    if current_node.depth+1 >= best_depth:
-        return None
+    # Setup
+    start_node, prev_loc_grid = level_to_class(level_num)
+    nodequeue = q.Queue()
+    nodequeue.put(start_node)
 
-    current_node.next_gen()
-    for node in current_node.next_nodes:
-        if node.complete:
-            return node
+    # Repeat getting the first node from the queue while there is one. If there isn't one, then
+    # there was no successful state, making it unsolvable.
+    while not nodequeue.empty():
+        current_node = nodequeue.get()
+        sys.stdout.write("\rCurrently testing: " + current_node.path)  # Overwrite testing line for "loading" look
+        sys.stdout.flush()
 
-    best_successor = None
-    for node in current_node.next_nodes:
-        if not node.failed:
-            potential_successor = find_solution_rec(node, best_depth)
-            if potential_successor is not None:
-                best_depth = potential_successor.depth
-                best_successor = potential_successor
+        # If it was complete, we have found the optimal solution, because of the nature of the queue. If a path is
+        # tested, it means that all shorter paths failed.
+        if current_node.complete:
+            ret = current_node.path
+            break
 
-    return best_successor
+        # For each child, add it to the queue so that we can test it later
+        children = current_node.next_gen(prev_loc_grid)
+        for child in children:
+            nodequeue.put(child)
+
+    sys.stdout.write("\r")
+    return ret
+
 
 def main():
     """
@@ -227,15 +220,14 @@ def main():
     :return: None
     """
     print "Finding solutions to the SliderGame levels! Hold on tight!\n"
-    #max_test = sg.FINAL_LEVEL
-    max_test = 4
-    for level in range(1, max_test+1):
+    for level in range(1, sg.FINAL_LEVEL+1):
         print "Finding Solution for level " + str(level) + "..."
-        level_state = level_to_class(level)
-        path = find_solution(level_state)
-        print "Solution found! The answer is: " + path + '\n'
+        path = find_solution(level)
+        print "Solution found! The answer is: (" + path + "), comprising of " + str(len(path)) + " moves\n"
         savefile = open("assets/solutions/Level" + str(level) + "solution.sol", 'w')
         savefile.write(path)
+        savefile.close()
+
 
 if __name__ == "__main__":
     main()
