@@ -1,17 +1,36 @@
+"""
+Filename: slider_editor.py
+Interpreter: 2.7
+Author: Tim Johnson
+Description: A helper script to edit the levels graphically using keystrokes and the mouse position
+"""
 import pygame, sys, math, slidergame
 
+# Probably doesn't need to be global
 mousePos = [0,0]
 
 def setTile(tile):
+    """
+    Sets the tile under the mouse to the type given
+    :param tile: id of the tile type to set
+    :return: None
+    """
     row = int(math.floor(mousePos[1] / 20))
     column = int(math.floor(mousePos[0] / 20))
     slidergame.levelGrid[row][column] = tile
 
 def main():
+    """
+    Edits the level specified
+    :return:
+    """
     slidergame.init()
     slidergame.screen = pygame.display.set_mode((500, 500))
-
-    level = raw_input("What level do you want to edit?\n")
+    
+    if len(sys.argv) != 2:
+        level = raw_input("What level do you want to edit?\n")
+    else:
+        level = int(sys.argv[1])
     slidergame.loadLevel(level)
 
     global mousePos

@@ -1,6 +1,14 @@
+"""
+Filename: slidergame.py
+Interpreter: 2.7
+Author: Tim Johnson
+Description: A game built with pygame that involves the player solving puzzles by sliding the
+                hero across a grid until it reaches the goal.
+"""
 import sys, pygame, math, pygame.mixer
 pygame.init()
 
+# Constants
 GRID_SIZE = 25
 ID_WALL             = 1
 ID_LAVA             = 2
@@ -16,9 +24,6 @@ ID_PURPLE_TP        = 11
 ID_ORANGE_TILE_ON   = 12
 ID_TEAL_TILE_ON     = 13
 ID_BLUE_TILE_ON     = 14
-
-
-#Frequently Changed
 FINAL_LEVEL = 12
 
 # Colors
@@ -61,6 +66,10 @@ speed = 5
 lvlTitle = ""
 
 def init():
+    """
+    Initializes all sprites and the window
+    :return: None
+    """
     pygame.display.set_caption("Slider Game")
 
     borderColor = 84, 84, 69
@@ -140,18 +149,34 @@ def init():
     hero.fill(heroColor, pygame.Rect(0, 0, 20, 20))
 
 def minDigits(numStr, digits):
+    """
+    Helper function to return a string with a minimum number of digits
+    :param numStr: string of the number to check
+    :param digits: number of digits to have at a minimum
+    :return: given string with the minimum number of digits
+    """
     if len(numStr) < digits:
         for i in range(digits - len(numStr)):
             numStr = '0' + numStr
     return numStr
 
 def keyPressed(key):
+    """
+    Checks to see if the given key is pressed
+    :param key: key to check
+    :return: whether or not the key is pressed
+    """
     if keysJustPressed[key]:
         keysJustPressed[key] = False
         return True
     return False
 
 def saveLevel(level):
+    """
+    Function to save levels in the correct format
+    :param level: level number to save
+    :return: None
+    """
     saveFile = open("assets/levels/Level" + str(level) + ".txt", 'w')
     saveFile.truncate()
     for i in range(0, len(levelGrid)):
@@ -175,6 +200,11 @@ def saveLevel(level):
     saveFile.close()
 
 def loadLevel(level):
+    """
+    Loads the level from the text file
+    :param level: level number to load
+    :return: None
+    """
     global spawn, disappearingTilesOn
     global tp1Locations, tp2Locations, disappearingTilesInitState, lvlTitle
 
@@ -209,6 +239,10 @@ def loadLevel(level):
         wow = 2
 
 def fillGameArea():
+    """
+    Fills the game area sprite with the tiles given the level information as well as the hero
+    :return: None
+    """
     for row in range(0, len(levelGrid)):
         for col in range(0, len(levelGrid[row])):
             if levelGrid[row][col] == 0:
@@ -263,6 +297,11 @@ def fillGameArea():
         gameArea.blit(hero, pygame.Rect(heroPos[0], heroPos[1], 20, 20))
 
 def renderFrame(msSinceStart):
+    """
+    Renders the entire frame with the game area and extra information and displays it
+    :param msSinceStart: milliseconds since game start
+    :return: None
+    """
     screen.fill(backgroundClr)
     lvlLabel = largeFont.render("Level: " + str(currentLevel), True, (255, 255, 255))
     screen.blit(lvlLabel,
@@ -281,8 +320,12 @@ def renderFrame(msSinceStart):
     pygame.display.flip()
 
 def main():
+    """
+    Plays the game starting from level 1
+    :return: None
+    """
     init()
-    #pygame.mixer.Sound("assets/audio/bckgrndMusic.wav").play(-1)
+    pygame.mixer.Sound("assets/audio/bckgrndMusic.wav").play(-1)
 
     global heroPos, disappearingTilesOn, heroVel, currentLevel
     dirMoving = None
