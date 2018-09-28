@@ -6,8 +6,7 @@ Description: A project designed to find the best solution to every level of my s
 """
 import slidergame as sg
 import Queue as q
-import copy
-import sys
+import copy, sys, time
 
 # Constants for direction enumeration
 DOWN = "V"
@@ -198,6 +197,7 @@ def find_solution(level_num):
         current_node = nodequeue.get()
         sys.stdout.write("\rCurrently testing: " + current_node.path)  # Overwrite testing line for "loading" look
         sys.stdout.flush()
+        time.sleep(0.05)
 
         # If it was complete, we have found the optimal solution, because of the nature of the queue. If a path is
         # tested, it means that all shorter paths failed.
