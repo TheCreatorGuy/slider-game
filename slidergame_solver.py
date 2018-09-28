@@ -207,12 +207,12 @@ def find_solution_rec(current_node, best_depth=sys.maxint):
         return None
 
     current_node.next_gen()
-    for node in current_node.next_steps:
+    for node in current_node.next_nodes:
         if node.complete:
             return node
 
     best_successor = None
-    for node in current_node.next_steps:
+    for node in current_node.next_nodes:
         if not node.failed:
             potential_successor = find_solution_rec(node, best_depth)
             if potential_successor is not None:
