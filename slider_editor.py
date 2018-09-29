@@ -26,7 +26,7 @@ def main():
     """
     slidergame.init()
     slidergame.screen = pygame.display.set_mode((500, 500))
-    
+
     if len(sys.argv) != 2:
         level = raw_input("What level do you want to edit?\n")
     else:
